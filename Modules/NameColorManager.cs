@@ -56,10 +56,6 @@ public static class NameColorManager
         if ((seer.Is(CustomRoles.Narc) && !seer.Is(CustomRoles.Parasite) && !seer.Is(CustomRoles.Crewpostor)) && target.Is(CustomRoles.Refugee)) color = Main.roleColors[CustomRoles.Traitor];
         if ((seer.Is(CustomRoles.Narc) && seer.Is(CustomRoles.Crewpostor)) && target.Is(Custom_Team.Impostor) && Crewpostor.KnowsAllies.GetBool()) color = Main.roleColors[CustomRoles.Impostor];
 
-        // Sheriff and Narc
-        if (seer.Is(CustomRoles.Sheriff) && target.Is(CustomRoles.Narc)) color = Main.roleColors[CustomRoles.Narc];
-        if (seer.Is(CustomRoles.Narc) && target.Is(CustomRoles.Sheriff)) color = Main.roleColors[CustomRoles.Sheriff];
-
         // Cultist
         if (Cultist.NameRoleColor(seer, target)) color = Main.roleColors[CustomRoles.Cultist];
 
