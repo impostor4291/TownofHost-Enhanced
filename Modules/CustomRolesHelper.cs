@@ -362,7 +362,8 @@ public static class CustomRolesHelper
             or CustomRoles.Infected
             or CustomRoles.Contagious
             or CustomRoles.Rascal
-            or CustomRoles.Soulless;
+            or CustomRoles.Soulless
+            or CustomRoles.Narc;
     }
 
     public static bool IsImpOnlyAddon(this CustomRoles role)
