@@ -302,7 +302,18 @@ class BeginCrewmatePatch
     {
         var role = PlayerControl.LocalPlayer.GetCustomRole();
 
-        if (role.IsMadmate() || PlayerControl.LocalPlayer.Is(CustomRoles.Madmate))
+        if (PlayerControl.LocalPlayer.Is(CustomRoles.Narc))
+        {
+            var narcDisplay = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
+            narcDisplay.Add(PlayerControl.LocalPlayer);
+            foreach (var pc in Main.AllAlivePlayerControls)
+            {
+                if (pc != PlayerControl.LocalPlayer)
+                    narcDisplay.Add(pc);
+            }
+            teamToDisplay = narcDisplay;
+        }
+        else if (role.IsMadmate() || PlayerControl.LocalPlayer.Is(CustomRoles.Madmate))
         {
             teamToDisplay = new Il2CppSystem.Collections.Generic.List<PlayerControl>();
             teamToDisplay.Add(PlayerControl.LocalPlayer);
@@ -461,7 +472,7 @@ class BeginCrewmatePatch
                 break;
         }
 
-        if (PlayerControl.LocalPlayer.Is(CustomRoles.Madmate) || role.IsMadmate())
+        if ((PlayerControl.LocalPlayer.Is(CustomRoles.Madmate) || role.IsMadmate()) && !PlayerControl.LocalPlayer.Is(CustomRoles.Narc))
         {
             __instance.TeamTitle.text = GetString("TeamMadmate");
             __instance.TeamTitle.color = __instance.BackgroundBar.material.color = new Color32(255, 25, 25, byte.MaxValue);
@@ -470,6 +481,15 @@ class BeginCrewmatePatch
             __instance.ImpostorText.text = GetString("SubText.Madmate");
         }
 
+        if (PlayerControl.LocalPlayer.Is(CustomRoles.Narc))
+        {
+            __instance.TeamTitle.text = GetString("TeamCrewmate");
+            __instance.TeamTitle.color = __instance.BackgroundBar.material.color = new Color32(140, 255, 255, byte.MaxValue);
+            PlayerControl.LocalPlayer.Data.Role.IntroSound = GetIntroSound(RoleTypes.Crewmate);
+            __instance.ImpostorText.gameObject.SetActive(true);
+            __instance.ImpostorText.text = GetString("SubText.Crewmate");
+        }
+        
         if (Options.CurrentGameMode == CustomGameMode.FFA)
         {
             __instance.TeamTitle.text = "FREE FOR ALL";
@@ -527,7 +547,7 @@ class BeginImpostorPatch
     {
         var role = PlayerControl.LocalPlayer.GetCustomRole();
         
-        if (role.IsMadmate() || PlayerControl.LocalPlayer.Is(CustomRoles.Madmate))
+        if ((role.IsMadmate() || PlayerControl.LocalPlayer.Is(CustomRoles.Madmate)) && !PlayerControl.LocalPlayer.Is(CustomRoles.Narc))
         {
             yourTeam = new();
             yourTeam.Add(PlayerControl.LocalPlayer);
