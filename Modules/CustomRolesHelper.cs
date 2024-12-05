@@ -773,7 +773,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Hurried)
                     || pc.Is(CustomRoles.Gangster)
                     || pc.Is(CustomRoles.Admirer)
-                    || pc.Is(CustomRoles.GuardianAngelTOHE))
+                    || pc.Is(CustomRoles.GuardianAngelTOHE)
+                    || pc.Is(CustomRoles.Narc))
                     return false;
                 if (pc.GetCustomRole().IsNeutral() || pc.GetCustomRole().IsMadmate() || pc.IsAnySubRole(sub => sub.IsConverted()))
                     return false;
@@ -782,7 +783,8 @@ public static class CustomRolesHelper
                 break;
 
             case CustomRoles.Mimic:
-                if (pc.Is(CustomRoles.Nemesis))
+                if (pc.Is(CustomRoles.Nemesis)
+                    || pc.Is(CustomRoles.Narc))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -814,7 +816,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Lightning)
                     || pc.Is(CustomRoles.Swift)
                     || pc.Is(CustomRoles.Swooper)
-                    || pc.Is(CustomRoles.DoubleAgent))
+                    || pc.Is(CustomRoles.DoubleAgent)
+                    || pc.Is(CustomRoles.Narc))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -837,7 +840,8 @@ public static class CustomRolesHelper
                     || pc.Is(CustomRoles.Trapster)
                     || pc.Is(CustomRoles.Onbound)
                     || pc.Is(CustomRoles.Rebound)
-                    || pc.Is(CustomRoles.Tired))
+                    || pc.Is(CustomRoles.Tired)
+                    || pc.Is(CustomRoles.Narc))
                     return false;
                 if (!pc.GetCustomRole().IsImpostor())
                     return false;
@@ -1089,6 +1093,19 @@ public static class CustomRolesHelper
             case CustomRoles.Evader:
                 if (pc.IsNeutralApocalypse())
                     return false; 
+                break;
+
+            case CustomRoles.Narc:
+                if ((!pc.GetCustomRole().IsImpostor() 
+                    && !pc.Is(CustomRoles.Parasite) 
+                    && !pc.Is(CustomRoles.Crewpostor))
+                    || pc.Is(CustomRoles.Visionary)
+                    || pc.Is(CustomRoles.DoubleAgent)
+                    || pc.Is(CustomRoles.Egoist)
+                    || pc.Is(CustomRoles.Mare)
+                    || pc.Is(CustomRoles.Mimic)
+                    || pc.Is(CustomRoles.Circumvent))
+                    return false;
                 break;
         }
 
