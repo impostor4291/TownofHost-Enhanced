@@ -1019,6 +1019,7 @@ class ReportDeadBodyPatch
 
             Sleuth.OnReportDeadBody(player, target);
             Evader.ReportDeadBody();
+            Narc.OnReportDeadBody(player);
         }
         catch (Exception error)
         {
