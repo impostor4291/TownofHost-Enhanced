@@ -1,6 +1,7 @@
 using AmongUs.Data;
 using System;
 using TOHE.Roles.Core;
+using TOHE.Roles.AddOns.Impostor;
 using TOHE.Roles.Neutral;
 
 namespace TOHE;
@@ -122,6 +123,8 @@ class ExileControllerWrapUpPatch
             // Check for remove pet
             player.RpcRemovePet();
         }
+
+        Narc.OnPlayerExiled(exiled);
 
         Main.MeetingIsStarted = false;
         Main.MeetingsPassed++;
