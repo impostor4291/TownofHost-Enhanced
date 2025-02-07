@@ -21,6 +21,8 @@ public class Narc : IAddon
     private static OptionItem NarcHasCrewVision;
     public static OptionItem MadmateCanBeNarc;
 
+    private static byte ReporterId;
+
     public void SetupCustomOption()
     {
         SetupAdtRoleOptions(Id, CustomRoles.Narc, canSetNum: false, tab: TabGroup.Addons, canSetChance: false);
@@ -44,7 +46,9 @@ public class Narc : IAddon
     public void Init()
     { }
     public void Add(byte playerId, bool gameIsLoading = true)
-    { }
+    { 
+        ReporterId = byte.MaxValue;
+    }
     public void Remove(byte playerId)
     { }
 
@@ -60,8 +64,8 @@ public class Narc : IAddon
         int assignvalue = IRandom.Instance.Next(1, totalimpnum);
 
         bool mmisnarc = true;
-        if (optmmnum == 0) mmisnarc = false;
-        else if (!MadmateCanBeNarc.GetBool()) mmisnarc = false;
+        if (optmmnum == 0) mmisnarc = false;//if NumberOfMadmates is set to 0,Madmate roles can't be Narc
+        else if (!MadmateCanBeNarc.GetBool()) mmisnarc = false;//if setting is off,Madmates can't be Narc
         else if (assignvalue > optmmnum) mmisnarc = false;
     
         return mmisnarc;
@@ -77,7 +81,6 @@ public class Narc : IAddon
         => role is CustomRoles.Egoist or CustomRoles.Mare or CustomRoles.Mimic;
 ///-------------------------------------------------------------------------------------------------///
 
-    //Narc Checkmurder
     public static bool CancelMurder(PlayerControl killer, PlayerControl target)
     {
         var ShouldCancel = false;
@@ -107,6 +110,24 @@ public class Narc : IAddon
             opt.SetFloat(FloatOptionNames.CrewLightMod, crewvision);
             opt.SetFloat(FloatOptionNames.ImpostorLightMod, crewvision);
         }
+    }
+
+    public static void OnReportDeadBody(PlayerControl reporter)
+    {
+        ReporterId = reporter.PlayerId;//remember reporter
+        Utils.NotifyRoles(SpecifySeer: reporter);
+    }
+    public static void OnPlayerExiled(NetworkedPlayerInfo exiled)
+    {
+        if (!ReporterId.GetPlayer().Is(CustomRoles.Narc) || exiled.Object == null) return;//If reporter isn't Narc,don't do anything
+        var narc = ReporterId.GetPlayer();
+        if (IsImp(exiled.PlayerId) && exiled.Object.GetRealKiller() == null) //If exiled player is an impostor(excluding Admired) or a Madmate,count the ejection as Narc's kill
+            exiled.Object.SetRealKiller(narc);      
+    }
+    private static bool IsImp(byte id)
+    {
+        var pc = id.GetPlayer();
+        return (pc.IsNonNarcImpV3() && !pc.Is(CustomRoles.Admired)) || pc.Is(CustomRoles.Madmate);
     }
 
     public static bool CheckWinCondition(CustomWinner winner, GameOverReason reason)
