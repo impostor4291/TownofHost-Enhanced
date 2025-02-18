@@ -75,7 +75,7 @@ public class Narc : IAddon
             ShouldCancel = true;
         }
         else if ((!FirstTrigger || killer.Is(CustomRoles.Witch)) 
-        && target.Is(CustomRoles.ChiefOfPolice) && !target.GetCustomRole().IsConverted())
+        && target.Is(CustomRoles.ChiefOfPolice) && !target.IsAnySubRole(x => x.IsConverted()))
         {
             killer.SetDeathReason(PlayerState.DeathReason.Misfire);
             killer.RpcMurderPlayer(killer);
@@ -87,7 +87,7 @@ public class Narc : IAddon
     public static void ApplyGameOptions(IGameOptions opt, PlayerControl player)
     {
         bool lightsout = Utils.IsActive(SystemTypes.Electrical) && player.GetCustomRole().IsImpostor() && !(player.Is(CustomRoles.Torch) && !Torch.TorchAffectedByLights.GetBool());
-        float narcVision = player.Is(CustomRoles.Bewilder) ? Bewilder.BewilderVision.GetFloat() : player.Is(CustomRoles.Torch) ? Torch.TorchVision.GetFloat() : Main.DefaultCrewmateVision;
+        float narcVision = Main.DefaultCrewmateVision;
         if (!player.Is(CustomRoles.KillingMachine) && !player.Is(CustomRoles.Zombie)
             && NarcHasCrewVision.GetBool())
         {
