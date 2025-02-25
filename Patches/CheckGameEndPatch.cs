@@ -607,6 +607,13 @@ class GameEndCheckerForNormal
         {
             reason = GameOverReason.ImpostorByKill;
 
+            if (CustomRoles.NotAssigned.RoleExist(true))
+            {
+                reason = GameOverReason.ImpostorBySabotage;
+                ResetAndSetWinner(CustomWinner.Draw);
+                Logger.Info($"CustomRoles.NotAssigned detected.End game due to error", "CheckGameEndPatch");      
+                return true;
+            }
             if (Sunnyboy.HasEnabled && Sunnyboy.CheckGameEnd()) return false;
             var neutralRoleCounts = new Dictionary<CountTypes, int>();
             var allAlivePlayerList = Main.AllAlivePlayerControls.ToArray();
