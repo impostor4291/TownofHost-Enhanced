@@ -461,9 +461,12 @@ internal class StartGameHostPatch
 
             try
             {
-                AddonAssign.StartAssignNarc();
-                AddonAssign.InitAndStartAssignLovers();
-                AddonAssign.StartSortAndAssign();
+                if (Options.CurrentGameMode is CustomGameMode.Standard)
+                {
+                    AddonAssign.StartAssignNarc();
+                    AddonAssign.InitAndStartAssignLovers();
+                    AddonAssign.StartSortAndAssign();
+                }
             }
             catch (Exception error)
             {
