@@ -459,12 +459,6 @@ internal class ChatCommands
                         Utils.SendMessage(GetString("DisableUseCommand"), PlayerControl.LocalPlayer.PlayerId);
                         break;
                     }
-                    var allAlivePlayers = Main.AllAlivePlayerControls;
-                    int impnum = allAlivePlayers.Count(pc => pc.IsNonNarcImp());
-                    int madnum = allAlivePlayers.Count(pc => pc.IsNonNarcMM() || pc.Is(CustomRoles.Madmate));
-                    int neutralnum = allAlivePlayers.Count(pc => pc.GetCustomRole().IsNK());
-                    int apocnum = allAlivePlayers.Count(pc => pc.IsNeutralApocalypse() || pc.IsTransformedNeutralApocalypse());
-                    int covnum = allAlivePlayers.Count(pc => pc.Is(Custom_Team.Coven));
 
                     var sub = new StringBuilder();
                     sub.Append(string.Format(GetString("Remaining.ImpostorCount"), impnum));
