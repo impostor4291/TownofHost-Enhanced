@@ -99,9 +99,10 @@ internal class Requiter : RoleBase
         // options disabled,requiter doesn't ignore protections
         if (!Knight.RequiterIgnoresShields.GetBool()) return true;
 
-        // requiter should never ignore Solsticer and Mini protections
+        // requiter should never ignore Solsticer,Mini and Punching Bag protections
         if (target.Is(CustomRoles.Solsticer)) return true;
         if ((target.Is(CustomRoles.NiceMini) || target.Is(CustomRoles.EvilMini)) && Mini.Age < 18) return true;
+        if (target.Is(CustomRoles.PunchingBag)) return true;
         
         killer.RpcMurderPlayer(target);
         killer.ResetKillCooldown();
