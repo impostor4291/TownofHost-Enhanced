@@ -149,7 +149,7 @@ internal class BountyHunter : RoleBase
     }
     private static bool PotentialTarget(PlayerControl player, PlayerControl target)
     {
-        if (target == null || player == null) return false;
+        if (target == null || player == null || target == player) return false;
 
         if (player.Is(CustomRoles.Lovers) && target.Is(CustomRoles.Lovers)) return false;
 
