@@ -2101,8 +2101,11 @@ internal class ChatCommands
 
         bool shouldDevAssign = isDev || isUp;
 
-        if (CustomRolesHelper.IsAdditionRole(result) || result is CustomRoles.GM or CustomRoles.Mini || result.IsGhostRole() && !isDev
-            || result.GetCount() < 1 || result.GetMode() == 0)
+        if ((result.IsAdditionRole() && result != CustomRoles.Narc)
+            || result is CustomRoles.GM or CustomRoles.Mini 
+            || (result.IsGhostRole() && !isDev)
+            || (result.GetCount() < 1 && result.GetRoleFromHiddenRole().GetCount() < 1)
+            || (result.GetMode() == 0 && result.GetRoleFromHiddenRole().GetMode() == 0))
         {
             shouldDevAssign = false;
         }
@@ -2111,10 +2114,37 @@ internal class ChatCommands
 
         if (isUp)
         {
-            if (result.IsGhostRole() || !shouldDevAssign)
+            if (result.IsGhostRole() || !shouldDevAssign
+                || (result is CustomRoles.EvilMini && !Mini.CanBeEvil.GetBool()))
             {
                 Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), Translator.GetActualRoleName(result)), playerId);
                 return;
+            }
+
+            if (result is CustomRoles.Narc)
+            {
+                var NRList = NarcManager.SelectedNarcRoles().Shuffle().ToList();
+                if (!NRList.Any())
+                {
+                    Utils.SendMessage(string.Format(GetString("Message.YTPlanSelectFailed"), Translator.GetActualRoleName(result)), playerId);
+                    return;
+                }
+                NarcManager.AssignedToHost = true;
+                var setrole = NRList.RandomElement();
+
+                GhostRoleAssign.forceRole.Remove(pid);
+                RoleAssign.SetRoles[pid] = setrole;
+                NarcManager.RoleForNarcToSpawnAs = setrole;
+
+                Utils.SendMessage(string.Format(GetString("Message.YTPlanSelected"), Translator.GetActualRoleName(result) + " " + Translator.GetActualRoleName(setrole)), playerId);
+                return;
+            }
+            // if host runs /up again after running "/up narc"
+            if (NarcManager.AssignedToHost)
+            {
+                if (NarcManager.SelectedNarcRoles().Contains(result)) // if result role can be Narc
+                    NarcManager.RoleForNarcToSpawnAs = result;
+                else NarcManager.AssignedToHost = false;
             }
 
             GhostRoleAssign.forceRole.Remove(pid);
