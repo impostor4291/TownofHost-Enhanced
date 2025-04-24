@@ -257,6 +257,18 @@ public static class CustomRolesHelper
             || Knight.CheckCanUseVent(target)
             || target.Is(CustomRoles.Nimble);
     }
+
+    /// <summary>
+    /// Get the respective main role from hidden role
+    public static CustomRoles GetRoleFromHiddenRole(this CustomRoles role)
+        => role switch
+        {
+            CustomRoles.Bard => CustomRoles.Arrogance,
+            CustomRoles.Sunnyboy => CustomRoles.Jester,
+            CustomRoles.Requiter => CustomRoles.Knight,
+            CustomRoles.EvilMini or CustomRoles.NiceMini => CustomRoles.Mini,
+            _ => role
+        };
     public static bool IsNeutral(this CustomRoles role)
     {
         if (role is
