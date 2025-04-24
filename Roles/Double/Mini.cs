@@ -1,6 +1,7 @@
 using Hazel;
 using InnerNet;
 using TOHE.Roles.Core;
+using TOHE.Roles.Core.AssignManager;
 using static TOHE.Translator;
 using static TOHE.Utils;
 
@@ -19,8 +20,8 @@ internal class Mini : RoleBase
     private static OptionItem GrowUpDuration;
     private static OptionItem EveryoneCanKnowMini;
     private static OptionItem CountMeetingTime;
-    private static OptionItem EvilMiniSpawnChances;
-    private static OptionItem CanBeEvil;
+    public static OptionItem EvilMiniSpawnChances;
+    public static OptionItem CanBeEvil;
     public static OptionItem CanGuessEvil;
     private static OptionItem UpDateAge;
     private static OptionItem MinorCD;
@@ -64,6 +65,8 @@ internal class Mini : RoleBase
             var rand = IRandom.Instance;
             IsEvilMini = CanBeEvil.GetBool() && (rand.Next(0, 100) < EvilMiniSpawnChances.GetInt());
         }
+        if (RoleAssign.SetRoles.ContainsValue(CustomRoles.EvilMini)) IsEvilMini = true;
+        if (RoleAssign.SetRoles.ContainsValue(CustomRoles.NiceMini)) IsEvilMini = false;
     }
     public override void Add(byte playerId)
     {
@@ -171,7 +174,7 @@ internal class Mini : RoleBase
     public override bool OnRoleGuess(bool isUI, PlayerControl target, PlayerControl guesser, CustomRoles role, ref bool guesserSuicide)
     {
         if (role is not CustomRoles.NiceMini or CustomRoles.EvilMini) return false;
-        if (Age < 18 && (target.Is(CustomRoles.NiceMini) || !CanGuessEvil.GetBool() && target.Is(CustomRoles.EvilMini)))
+        if (Age < 18 && (target.Is(CustomRoles.NiceMini) || (!CanGuessEvil.GetBool() && target.Is(CustomRoles.EvilMini))))
         {
             guesser.ShowInfoMessage(isUI, GetString("GuessMini"));
             return true;
