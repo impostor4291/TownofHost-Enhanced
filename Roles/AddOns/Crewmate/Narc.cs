@@ -9,6 +9,38 @@ namespace TOHE;
 
 public static class NarcManager
 {
+    /// <summary>
+    /// List of roles that can be Narc
+    /// </summary>
+    public static List<CustomRoles> SelectedNarcRoles()
+    {
+        var list  = new List<CustomRoles>();
+        foreach (var role in CustomRolesHelper.AllRoles
+                                    .Where(r => r.IsEnable() && !r.IsVanilla() && !r.IsGhostRole() && !r.IsAdditionRole()))
+        {
+            if (role is CustomRoles.Mini && Mini.EvilMiniSpawnChances.GetInt() > 0)
+            {
+                list.Add(CustomRoles.EvilMini);
+                continue;
+            }
+            if (!role.IsImpostor() && !role.IsMadmate()) continue;
+            if (role is CustomRoles.Arrogance && Arrogance.BardChance.GetInt() > 0)
+                list.Add(CustomRoles.Bard);
+            if (role is CustomRoles.Parasite 
+                || (role is CustomRoles.Crewpostor && !Crewpostor.AlliesKnowCrewpostor.GetBool()))
+                continue;
+            if (role is CustomRoles.PhantomTOHE) continue;
+            
+            list.Add(role);
+        }
+        return list;
+    }
+
+    /// <summary>
+    /// Checks if a role can be Narc
+    /// </summary>
+    public static bool CanBeNarc(this CustomRoles role) => SelectedNarcRoles().Contains(role);
+    
     //===========================SETUP================================\\
     public static CustomRoles RoleForNarcToSpawnAs;
     public static bool IsNarcAssigned() => RoleForNarcToSpawnAs != CustomRoles.NotAssigned;
@@ -56,31 +88,6 @@ public static class NarcManager
         CustomRoleCounts.Add(role, countOption);
     }
 
-    public static void InitForNarc()
-    {
-        RoleForNarcToSpawnAs = CustomRoles.NotAssigned;
-
-        int value = IRandom.Instance.Next(1, 100);
-
-        if (value <= NarcSpawnChance.GetInt() && CustomRoles.Narc.IsEnable())
-        {
-            List<CustomRoles> RolesEnabled = CustomRolesHelper.AllRoles
-                                        .Where(r => r.IsEnable() && (r.IsImpostor() /*|| r.IsMadmate()*/) && !r.IsVanilla() && !r.IsGhostRole())
-                                        .ToList();
-            var RolesToSelect = new List<CustomRoles>();
-            foreach (var improle in RolesEnabled)
-            {
-                if (RoleAssign.SetRoles.ContainsValue(improle)) continue;
-                //if (improle.IsMadmate() && !MadmateCanBeNarc.GetBool()) continue;
-                if (improle is CustomRoles.PhantomTOHE) continue;
-                RolesToSelect.Add(improle);
-            }
-
-            if (!RolesToSelect.Any()) return;
-            RolesToSelect = RolesToSelect.Shuffle().Shuffle().ToList();
-            RoleForNarcToSpawnAs = RolesToSelect.RandomElement();
-        }
-    }
 
 
     public static void ApplyGameOptions(IGameOptions opt, PlayerControl player)
@@ -98,6 +105,9 @@ public static class NarcManager
         => !Main.AllAlivePlayerControls.Any(x => x.GetCustomRole().IsImpostorTeamV3() && !x.IsPlayerCrewmateTeam()) || ImpsCanKillEachOther.GetBool();
     public static bool CantUseSabotage(PlayerControl pc) => pc.Is(CustomRoles.Narc) && !NarcCanUseSabotage.GetBool();
 
+    /// <summary>
+    /// Checks whether a player is Sheriff or ChiefOfPolice and not converted
+    /// </summary>
     public static bool IsPolice(this PlayerControl player)
         => (player.Is(CustomRoles.Sheriff) || player.Is(CustomRoles.ChiefOfPolice))
             && player.IsPlayerCrewmateTeam() && !CopyCat.playerIdList.Contains(player.PlayerId);
@@ -119,6 +129,9 @@ public static class NarcManager
         return color;
     }
 
+    /// <summary>
+    /// Checks if killer and target are teammates and should not kill each other
+    /// </summary>
     public static bool CheckMurder(PlayerControl killer, PlayerControl target)
     {
         if (killer.CheckImpCanSeeAllies(CheckAsSeer: true) 
