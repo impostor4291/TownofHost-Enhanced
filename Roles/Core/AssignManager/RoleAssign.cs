@@ -150,7 +150,10 @@ public class RoleAssign
                 case CustomRoles.NiceMini:
                 case CustomRoles.EvilMini:
                 case CustomRoles.Runner:
-                case CustomRoles.PhantomTOHE when NarcManager.IsNarcAssigned():
+                case CustomRoles.PhantomTOHE when NarcManager.IsNarcAssigned(): // desync Phantom basis issues...
+                case CustomRoles.Arrogance when SetRoles.ContainsValue(CustomRoles.Bard):
+                case CustomRoles.Jester when SetRoles.ContainsValue(CustomRoles.Sunnyboy):
+                case CustomRoles.Knight when SetRoles.ContainsValue(CustomRoles.Requiter):
                     continue;
             }
 
@@ -159,6 +162,13 @@ public class RoleAssign
 
             if (role is CustomRoles.Mini)
             {
+                if (SetRoles.ContainsValue(CustomRoles.NiceMini) || SetRoles.ContainsValue(CustomRoles.EvilMini)) continue;
+                if (NarcManager.RoleForNarcToSpawnAs == CustomRoles.EvilMini)
+                {
+                    info = new(CustomRoles.EvilMini, 100, 1);
+                    Roles[RoleAssignType.Crewmate].Add(info);  
+                    continue;
+                }
                 if (Mini.CheckSpawnEvilMini())
                 {
                     info = new(CustomRoles.EvilMini, chance, count);
@@ -172,15 +182,12 @@ public class RoleAssign
                 continue;
             }
 
-            if (role.IsImpostor())
+            if (role == NarcManager.RoleForNarcToSpawnAs)
             {
-                if (role == NarcManager.RoleForNarcToSpawnAs)
-                {
-                    RoleAssignInfo newinfo = new(role, 100, 1);
-                    Roles[RoleAssignType.Crewmate].Add(newinfo);
-                }
-                else Roles[RoleAssignType.Impostor].Add(info);
+                info = new(role, 100, 1);
+                Roles[RoleAssignType.Crewmate].Add(info);
             }
+            else if (role.IsImpostor()) Roles[RoleAssignType.Impostor].Add(info);
             else if (role.IsNK()) Roles[RoleAssignType.NeutralKilling].Add(info);
             else if (role.IsNA()) Roles[RoleAssignType.NeutralApocalypse].Add(info);
             else if (role.IsNonNK()) Roles[RoleAssignType.NonKillingNeutral].Add(info);
