@@ -12,6 +12,7 @@ using TOHE.Roles.Coven;
 using TOHE.Roles.Crewmate;
 using TOHE.Roles.Impostor;
 using TOHE.Roles.Neutral;
+using TOHE.Roles.Double;
 using UnityEngine;
 using static TOHE.Translator;
 
