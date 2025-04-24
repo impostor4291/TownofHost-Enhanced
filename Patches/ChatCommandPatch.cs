@@ -2142,7 +2142,7 @@ internal class ChatCommands
             // if host runs /up again after running "/up narc"
             if (NarcManager.AssignedToHost)
             {
-                if (NarcManager.SelectedNarcRoles().Contains(result)) // if result role can be Narc
+                if (result.CanBeNarc())
                     NarcManager.RoleForNarcToSpawnAs = result;
                 else NarcManager.AssignedToHost = false;
             }
