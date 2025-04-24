@@ -2,6 +2,8 @@ using System;
 using AmongUs.GameOptions;
 using TOHE.Roles.Core.AssignManager;
 using TOHE.Roles.Crewmate;
+using TOHE.Roles.Impostor;
+using TOHE.Roles.Double;
 using static TOHE.Options;
 using static TOHE.Translator;
 
@@ -44,6 +46,7 @@ public static class NarcManager
     //===========================SETUP================================\\
     public static CustomRoles RoleForNarcToSpawnAs;
     public static bool IsNarcAssigned() => RoleForNarcToSpawnAs != CustomRoles.NotAssigned;
+    public static bool AssignedToHost = false;
     //==================================================================\\
     private static OptionItem NarcSpawnChance;
     private static OptionItem NarcCanUseSabotage;
@@ -88,7 +91,21 @@ public static class NarcManager
         CustomRoleCounts.Add(role, countOption);
     }
 
+    public static void InitForNarc()
+    {
+        if (AssignedToHost) return;
+        RoleForNarcToSpawnAs = CustomRoles.NotAssigned;
 
+        int value = IRandom.Instance.Next(1, 100);
+
+        if (value <= NarcSpawnChance.GetInt() && CustomRoles.Narc.IsEnable())
+        {
+            if (!SelectedNarcRoles().Any()) return;
+            var RolesToSelect = SelectedNarcRoles().Shuffle().Shuffle().ToList();
+            RoleForNarcToSpawnAs = RolesToSelect.RandomElement();
+            Logger.Info("Select Role for Narc:" + RoleForNarcToSpawnAs.ToString(), "NarcManager");
+        }
+    }
 
     public static void ApplyGameOptions(IGameOptions opt, PlayerControl player)
     {
