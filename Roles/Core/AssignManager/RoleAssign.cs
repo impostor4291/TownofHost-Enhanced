@@ -291,7 +291,7 @@ public class RoleAssign
             RoleResult[item.Key] = item.Value;
             AllPlayers.Remove(pc);
 
-            if (item.Value.IsImpostor())
+            if (item.Value.IsImpostor() && item.Value != NarcManager.RoleForNarcToSpawnAs)
             {
                 Roles[RoleAssignType.Impostor].Where(x => x.Role == item.Value).Do(x => x.AssignedCount++);
                 readyImpNum++;
