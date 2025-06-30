@@ -120,7 +120,7 @@ public static class GuessManager
             pc.ShowInfoMessage(isUI, GetString("GuessDead"));
             return true;
         }
-        if ((pc.Is(Custom_Team.Crewmate) || pc.Is(CustomRoles.Narc)) && !Options.CrewmatesCanGuess.GetBool())
+        if ((pc.Is(Custom_Team.Crewmate) || (pc.Is(CustomRoles.Narc) && NarcManager.ShareGuessAccessWithCrew.GetBool())) && !Options.CrewmatesCanGuess.GetBool())
         {
             if (!pc.Is(CustomRoles.NiceGuesser) && !pc.Is(CustomRoles.EvilGuesser) && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Judge) && !pc.Is(CustomRoles.Councillor))
             {
@@ -128,7 +128,7 @@ public static class GuessManager
                 return true;
             }
         }
-        if ((pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !pc.Is(CustomRoles.Narc) && !Options.ImpostorsCanGuess.GetBool())
+        if ((pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !(pc.Is(CustomRoles.Narc) && NarcManager.ShareGuessAccessWithCrew.GetBool()) && !Options.ImpostorsCanGuess.GetBool())
         {
             if (!pc.Is(CustomRoles.EvilGuesser) && !pc.Is(CustomRoles.Guesser) && !pc.Is(CustomRoles.Councillor))
             {
@@ -293,14 +293,14 @@ public static class GuessManager
                     if (role.IsAdditionRole() && !Options.CanGuessAddons.GetBool())
                     {
                         // Impostors Cant Guess Addons
-                        if (Options.ImpostorsCanGuess.GetBool() && (pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !pc.Is(CustomRoles.Narc) && !(pc.Is(CustomRoles.EvilGuesser) || pc.Is(CustomRoles.Guesser)))
+                        if (Options.ImpostorsCanGuess.GetBool() && (pc.Is(Custom_Team.Impostor) || pc.GetCustomRole().IsMadmate()) && !(pc.Is(CustomRoles.Narc) && NarcManager.ShareGuessAccessWithCrew.GetBool()) && !(pc.Is(CustomRoles.EvilGuesser) || pc.Is(CustomRoles.Guesser)))
                         {
                             pc.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
                             return true;
                         }
 
                         // Crewmates Cant Guess Addons
-                        if (Options.CrewmatesCanGuess.GetBool() && (pc.Is(Custom_Team.Crewmate) || pc.Is(CustomRoles.Narc)) && !(pc.Is(CustomRoles.NiceGuesser) || pc.Is(CustomRoles.Guesser)))
+                        if (Options.CrewmatesCanGuess.GetBool() && (pc.Is(Custom_Team.Crewmate) || (pc.Is(CustomRoles.Narc) && NarcManager.ShareGuessAccessWithCrew.GetBool())) && !(pc.Is(CustomRoles.NiceGuesser) || pc.Is(CustomRoles.Guesser) || pc.Is(CustomRoles.EvilGuesser)))
                         {
                             pc.ShowInfoMessage(isUI, GetString("GuessAdtRole"));
                             return true;
@@ -642,15 +642,15 @@ public static class GuessManager
 
             if (Options.GuesserMode.GetBool())
             {
-                if (PlayerControl.LocalPlayer.IsAlive() && (PlayerControl.LocalPlayer.Is(Custom_Team.Impostor) || PlayerControl.LocalPlayer.GetCustomRole().IsMadmate()) && !PlayerControl.LocalPlayer.Is(CustomRoles.Narc) && Options.ImpostorsCanGuess.GetBool())
+                if (PlayerControl.LocalPlayer.IsAlive() && (PlayerControl.LocalPlayer.Is(Custom_Team.Impostor) || PlayerControl.LocalPlayer.GetCustomRole().IsMadmate()) && !(PlayerControl.LocalPlayer.Is(CustomRoles.Narc) && NarcManager.ShareGuessAccessWithCrew.GetBool()) && Options.ImpostorsCanGuess.GetBool())
                     CreateGuesserButton(__instance);
-                else if (PlayerControl.LocalPlayer.GetCustomRole() is CustomRoles.EvilGuesser && !PlayerControl.LocalPlayer.Is(CustomRoles.Narc) && !Options.ImpostorsCanGuess.GetBool())
+                else if (PlayerControl.LocalPlayer.GetCustomRole() is CustomRoles.EvilGuesser && !(PlayerControl.LocalPlayer.Is(CustomRoles.Narc) && NarcManager.ShareGuessAccessWithCrew.GetBool()) && !Options.ImpostorsCanGuess.GetBool())
                     CreateGuesserButton(__instance);
 
-                if (PlayerControl.LocalPlayer.IsAlive() && (PlayerControl.LocalPlayer.Is(Custom_Team.Crewmate) || PlayerControl.LocalPlayer.Is(CustomRoles.Narc)) && Options.CrewmatesCanGuess.GetBool())
+                if (PlayerControl.LocalPlayer.IsAlive() && (PlayerControl.LocalPlayer.Is(Custom_Team.Crewmate) || (PlayerControl.LocalPlayer.Is(CustomRoles.Narc) && NarcManager.ShareGuessAccessWithCrew.GetBool())) && Options.CrewmatesCanGuess.GetBool())
                     CreateGuesserButton(__instance);
                 else if ((PlayerControl.LocalPlayer.GetCustomRole() is CustomRoles.NiceGuesser
-                         || (PlayerControl.LocalPlayer.Is(CustomRoles.EvilGuesser) && PlayerControl.LocalPlayer.Is(CustomRoles.Narc))) && !Options.CrewmatesCanGuess.GetBool())
+                         || (PlayerControl.LocalPlayer.Is(CustomRoles.EvilGuesser) && PlayerControl.LocalPlayer.Is(CustomRoles.Narc) && NarcManager.ShareGuessAccessWithCrew.GetBool())) && !Options.CrewmatesCanGuess.GetBool())
                     CreateGuesserButton(__instance);
 
                 if (PlayerControl.LocalPlayer.IsAlive() && PlayerControl.LocalPlayer.GetCustomRole().IsNK() && Options.NeutralKillersCanGuess.GetBool())
@@ -821,8 +821,8 @@ public static class GuessManager
                       PlayerControl.LocalPlayer.Is(CustomRoles.Doomsayer) ||
                       PlayerControl.LocalPlayer.Is(CustomRoles.Guesser)))
                 {
-                    if (!Options.CrewCanGuessCrew.GetBool() && (PlayerControl.LocalPlayer.Is(Custom_Team.Crewmate) || PlayerControl.LocalPlayer.Is(CustomRoles.Narc)) && TabId == 0) continue;
-                    if (!Options.ImpCanGuessImp.GetBool() && (PlayerControl.LocalPlayer.Is(Custom_Team.Impostor) || PlayerControl.LocalPlayer.GetCustomRole().IsMadmate()) && !PlayerControl.LocalPlayer.Is(CustomRoles.Narc) && TabId == 1) continue;
+                    if (!Options.CrewCanGuessCrew.GetBool() && (PlayerControl.LocalPlayer.Is(Custom_Team.Crewmate) || (PlayerControl.LocalPlayer.Is(CustomRoles.Narc)  && NarcManager.ShareGuessAccessWithCrew.GetBool())) && TabId == 0) continue;
+                    if (!Options.ImpCanGuessImp.GetBool() && (PlayerControl.LocalPlayer.Is(Custom_Team.Impostor) || PlayerControl.LocalPlayer.GetCustomRole().IsMadmate()) && !(PlayerControl.LocalPlayer.Is(CustomRoles.Narc) && NarcManager.ShareGuessAccessWithCrew.GetBool()) && TabId == 1) continue;
                     if (!Options.CovenCanGuessCoven.GetBool() && PlayerControl.LocalPlayer.Is(Custom_Team.Coven) && TabId == 3) continue;
                     if (!Options.CanGuessAddons.GetBool() && TabId == 4) continue;
                 }
